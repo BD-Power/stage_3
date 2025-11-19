@@ -13,10 +13,12 @@ public class SearchClusterConfig {
         Config config = new Config();
         config.setClusterName("search-cluster");
 
+        // Map config
         MapConfig mapConfig = new MapConfig("inverted-index");
         mapConfig.setBackupCount(1);
         config.addMapConfig(mapConfig);
 
+        // Network join: TCP-IP (útil en local)
         config.getNetworkConfig()
                 .getJoin()
                 .getMulticastConfig().setEnabled(false);
@@ -24,7 +26,7 @@ public class SearchClusterConfig {
         config.getNetworkConfig()
                 .getJoin()
                 .getTcpIpConfig().setEnabled(true)
-                .addMember("127.0.0.1");
+                .addMember("127.0.0.1"); // localhost; si usas varios hosts, pon todas las IPs
 
         return config;
     }
