@@ -6,8 +6,9 @@
 
     <parent>
         <groupId>es.ulpgc.searchcluster</groupId>
-        <artifactId>stage_3</artifactId>
+        <artifactId>stage_3-main</artifactId>
         <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>common</artifactId>

@@ -1,7 +1,10 @@
 package org.example;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,25 +12,23 @@ import org.springframework.context.annotation.Configuration;
 public class SearchClusterConfig {
 
     @Bean
-    public Config hazelcastConfig() {
+    public HazelcastInstance hazelcastInstance() {
+
+        // Config Hazelcast
         Config config = new Config();
         config.setClusterName("search-cluster");
 
-        // Map config
+        // Map config (inverted index)
         MapConfig mapConfig = new MapConfig("inverted-index");
         mapConfig.setBackupCount(1);
         config.addMapConfig(mapConfig);
 
-        // Network join: TCP-IP (útil en local)
-        config.getNetworkConfig()
-                .getJoin()
-                .getMulticastConfig().setEnabled(false);
+        // AUTO-DISCOVERY: activar multicast para descubrir los indexers y otros search nodes
+        JoinConfig join = config.getNetworkConfig().getJoin();
+        join.getMulticastConfig().setEnabled(true);
+        join.getTcpIpConfig().setEnabled(false);
 
-        config.getNetworkConfig()
-                .getJoin()
-                .getTcpIpConfig().setEnabled(true)
-                .addMember("127.0.0.1"); // localhost; si usas varios hosts, pon todas las IPs
-
-        return config;
+        // Crear instancia Hazelcast
+        return Hazelcast.newHazelcastInstance(config);
     }
 }

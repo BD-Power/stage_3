@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -6,15 +7,16 @@
 
     <parent>
         <groupId>es.ulpgc.searchcluster</groupId>
-        <artifactId>stage_3</artifactId>
+        <artifactId>stage_3-main</artifactId>
         <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>search-service</artifactId>
     <name>Search Service</name>
 
     <dependencies>
-        <!-- SPRING -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -25,25 +27,34 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- HAZELCAST -->
         <dependency>
             <groupId>com.hazelcast</groupId>
             <artifactId>hazelcast</artifactId>
-            <version>5.3.2</version>
         </dependency>
 
         <dependency>
             <groupId>com.hazelcast</groupId>
             <artifactId>hazelcast-spring</artifactId>
-            <version>5.3.2</version>
         </dependency>
 
-        <!-- COMMON -->
         <dependency>
             <groupId>es.ulpgc.searchcluster</groupId>
             <artifactId>common</artifactId>
             <version>1.0.0</version>
         </dependency>
+
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>org.example.SearchServiceApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

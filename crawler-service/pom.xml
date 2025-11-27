@@ -1,43 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Hereda del pom de stage_3-main -->
     <parent>
         <groupId>es.ulpgc.searchcluster</groupId>
-        <artifactId>stage_3</artifactId>
+        <artifactId>stage_3-main</artifactId>
         <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
+    <!-- NOMBRE REAL DEL SERVICIO -->
     <artifactId>crawler-service</artifactId>
     <name>Crawler Service</name>
 
     <dependencies>
-        <!-- Base de Spring -->
+
+        <!-- Base Spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- Web REST (si el crawler expone endpoints HTTP) -->
+        <!-- Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- ActiveMQ (mensajería) -->
+        <!-- ActiveMQ -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-activemq</artifactId>
         </dependency>
 
-        <!-- Dependencia común -->
+        <!-- Common module -->
         <dependency>
             <groupId>es.ulpgc.searchcluster</groupId>
             <artifactId>common</artifactId>
             <version>1.0.0</version>
         </dependency>
+
     </dependencies>
+
+    <!--  BLOQUE QUE FALTABA (MAIN CLASS)  -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>org.example.CrawlerApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
