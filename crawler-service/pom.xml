@@ -5,7 +5,6 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Hereda del pom de stage_3-main -->
     <parent>
         <groupId>es.ulpgc.searchcluster</groupId>
         <artifactId>stage_3-main</artifactId>
@@ -13,52 +12,42 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <!-- NOMBRE REAL DEL SERVICIO -->
     <artifactId>crawler-service</artifactId>
     <name>Crawler Service</name>
 
-    <!-- Eliminando duplicado de ActiveMQ -->
     <dependencies>
-        <!-- Base Spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- ActiveMQ -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-activemq</artifactId>
         </dependency>
 
-        <!-- Common module -->
         <dependency>
             <groupId>es.ulpgc.searchcluster</groupId>
             <artifactId>common</artifactId>
-        </dependency>
+            <version>${project.parent.version}</version>  </dependency>
 
-        <!-- Jackson para JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
-        <!-- Hazelcast client -->
         <dependency>
             <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast-client</artifactId>
-            <version>5.5.2</version>
+            <artifactId>hazelcast</artifactId>
         </dependency>
     </dependencies>
 
 
-    <!--  BLOQUE QUE FALTABA (MAIN CLASS)  -->
     <build>
         <plugins>
             <plugin>
