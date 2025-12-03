@@ -17,8 +17,8 @@
     <artifactId>crawler-service</artifactId>
     <name>Crawler Service</name>
 
+    <!-- Eliminando duplicado de ActiveMQ -->
     <dependencies>
-
         <!-- Base Spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -41,13 +41,6 @@
         <dependency>
             <groupId>es.ulpgc.searchcluster</groupId>
             <artifactId>common</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <!-- JMS / ActiveMQ -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-activemq</artifactId>
         </dependency>
 
         <!-- Jackson para JSON -->
@@ -56,15 +49,14 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
-        <!-- En indexer-service: Hazelcast client -->
+        <!-- Hazelcast client -->
         <dependency>
             <groupId>com.hazelcast</groupId>
             <artifactId>hazelcast-client</artifactId>
             <version>5.5.2</version>
         </dependency>
-
-
     </dependencies>
+
 
     <!--  BLOQUE QUE FALTABA (MAIN CLASS)  -->
     <build>
