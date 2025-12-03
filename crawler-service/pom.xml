@@ -44,6 +44,26 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!-- JMS / ActiveMQ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-activemq</artifactId>
+        </dependency>
+
+        <!-- Jackson para JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- En indexer-service: Hazelcast client -->
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-client</artifactId>
+            <version>5.5.2</version>
+        </dependency>
+
+
     </dependencies>
 
     <!--  BLOQUE QUE FALTABA (MAIN CLASS)  -->
