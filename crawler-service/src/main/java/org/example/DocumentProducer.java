@@ -1,18 +1,41 @@
-package org.example;
+    package org.example;
 
-import es.ulpgc.searchcluster.DocumentEvent;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.stereotype.Component;
+    import com.fasterxml.jackson.databind.ObjectMapper;
+    import org.springframework.jms.core.JmsTemplate;
+    import org.springframework.stereotype.Component;
 
-@Component
-public class DocumentProducer {
-    private final JmsTemplate jms;
-    private final String destination = "documents.ingested";
+    import java.util.HashMap;
+    import java.util.Map;
 
-    public DocumentProducer(JmsTemplate jms) { this.jms = jms; }
+    @Component
+    public class DocumentProducer {
+        private final JmsTemplate jmsTemplate;
+        private final ObjectMapper mapper = new ObjectMapper();
 
-    public void sendDocumentIngested(String docId, String path) {
-        DocumentEvent ev = new DocumentEvent(docId, path);
-        jms.convertAndSend(destination, ev);
+        public DocumentProducer(JmsTemplate jmsTemplate) {
+            this.jmsTemplate = jmsTemplate;
+        }
+
+        public void sendDocumentReady(String documentId, String ruta, String hash) {
+            try {
+                Map<String, String> payload = new HashMap<>();
+                payload.put("type", "document_ready");
+                payload.put("documentId", documentId);
+                payload.put("ruta", ruta);
+                payload.put("hash", hash);
+
+                String json = mapper.writeValueAsString(payload);
+
+                jmsTemplate.convertAndSend("document.queue", json, message -> {
+                    message.setStringProperty("messageType", "document_ready");
+                    message.setJMSCorrelationID(documentId);
+                    return message;
+                });
+
+                System.out.println("Enviado mensaje document_ready id=" + documentId);
+            } catch (Exception e) {
+                throw new RuntimeException("Error enviando mensaje JMS: " + e.getMessage(), e);
+            }
+        }
     }
-}
+

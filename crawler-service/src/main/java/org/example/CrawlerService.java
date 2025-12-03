@@ -1,9 +1,15 @@
 package org.example;
 
+import org.example.DocumentProducer;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.util.UUID;
 
 @Service
 public class CrawlerService {
@@ -13,23 +19,49 @@ public class CrawlerService {
     public CrawlerService(DocumentProducer producer) {
         this.producer = producer;
     }
-    public List<Path> listDocuments(String folder) throws Exception {
-    // Ruta real dentro del contenedor: /data/<folder>
-    Path folderPath = Path.of("/data", folder);
 
-    List<Path> docs = Files.list(folderPath)
-            .filter(Files::isRegularFile)
-            .toList();
+    public int processFolder(String folder) throws IOException {
+        Path dir = Paths.get(folder);
 
-    // Emitir un mensaje por cada documento
-    for (Path file : docs) {
-        String id = file.getFileName().toString();
-        String path = file.toAbsolutePath().toString();
-        producer.sendDocumentIngested(id, path);
+        if (!Files.exists(dir)) {
+            throw new IOException("Folder does not exist: " + folder);
+        }
+
+        int count = 0;
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
+            for (Path file : stream) {
+                if (Files.isRegularFile(file)) {
+
+                    // Crear ID único para el documento
+                    String documentId = UUID.randomUUID().toString();
+
+                    // Calcular hash SHA-256
+                    String hash = computeHash(file);
+
+                    // Enviar mensaje a ActiveMQ
+                    producer.sendDocumentReady(documentId, file.toString(), hash);
+
+                    count++;
+                }
+            }
+        }
+
+        return count;
     }
 
-    return docs;
-}
+    private String computeHash(Path file) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] content = Files.readAllBytes(file);
+            byte[] hash = digest.digest(content);
 
-    
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) sb.append(String.format("%02x", b));
+            return sb.toString();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating hash: " + e.getMessage(), e);
+        }
+    }
 }
