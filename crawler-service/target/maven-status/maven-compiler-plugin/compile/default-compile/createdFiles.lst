@@ -1,0 +1,5 @@
+org\example\CrawlerApplication.class
+org\example\CrawlController.class
+org\example\CrawlerService.class
+org\example\DocumentProducer.class
+org\example\JmsConfig.class
