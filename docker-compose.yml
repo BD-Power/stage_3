@@ -1,0 +1,83 @@
+version: "3.9"
+
+services:
+  # 1. ActiveMQ Broker
+  activemq:
+    image: rmohr/activemq:5.15.9
+    container_name: activemq
+    ports:
+      - "8161:8161"         # Consola Web (para monitorización)
+    environment:
+      ACTIVEMQ_ADMIN_LOGIN: admin
+      ACTIVEMQ_ADMIN_PASSWORD: admin
+    networks:
+      - search_network
+    expose:
+      - 61616               # Puerto OpenWire (para JMS)
+
+  # 2. Crawler Service (Producer JMS)
+  crawler-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.crawler
+    depends_on:
+      - activemq
+    environment:
+      - SPRING_ACTIVEMQ_BROKER-URL=tcp://activemq:61616
+    volumes:
+      - datalake_data:/data # Montaje para el Datalake
+    networks:
+      - search_network
+    expose:
+      - 8080 # Puerto de Spring Boot (comunicación interna)
+
+  # 3. Indexer Service (Consumer JMS + Miembro Hazelcast)
+  indexer-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.indexer
+    depends_on:
+      - activemq
+    environment:
+      - SPRING_ACTIVEMQ_BROKER-URL=tcp://activemq:61616
+      - HZ_CLUSTER_NAME=bd-search-cluster # Nombre del clúster Hazelcast
+    expose:
+      - 8080 # Puerto de Spring Boot
+      - 5701 # Puerto de Hazelcast
+    networks:
+      - search_network
+
+  # 4. Search Service (Miembro Hazelcast)
+  search-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.search
+    depends_on:
+      - indexer-service
+    environment:
+      - HZ_CLUSTER_NAME=bd-search-cluster
+    expose:
+      - 8080 # Puerto de Spring Boot (Nginx lo necesita)
+      - 5701 # Puerto de Hazelcast
+    networks:
+      - search_network
+
+  # 5. Nginx (Load Balancer - Punto 4)
+  nginx:
+    image: nginx:latest
+    container_name: nginx-lb
+    ports:
+      - "80:80" # Único puerto público (punto de entrada)
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - search-service
+    networks:
+      - search_network
+
+volumes:
+  datalake_data: # Volumen persistente para el datalake
+
+networks:
+  search_network:
+    driver: bridge
