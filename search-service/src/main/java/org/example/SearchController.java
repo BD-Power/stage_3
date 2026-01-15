@@ -18,8 +18,9 @@ public class SearchController {
     }
 
     @GetMapping("/search")
-    public Collection<String> search(@RequestParam String term) {
+    public Collection<String> search(@RequestParam("term") String term) {
         MultiMap<String, String> index = hz.getMultiMap("inverted-index");
         return index.get(term.toLowerCase());
     }
 }
+

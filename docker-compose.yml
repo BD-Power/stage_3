@@ -47,8 +47,8 @@ services:
     networks:
       - search_network
 
-  # 4. Search Service (Miembro Hazelcast)
-  search-service:
+  # 4. Search Service (Miembro Hazelcast) - 2 replicas behind Nginx
+  search1:
     build:
       context: .
       dockerfile: Dockerfile.search
@@ -57,8 +57,22 @@ services:
     environment:
       - HZ_CLUSTER_NAME=bd-search-cluster
     expose:
-      - 8080 # Puerto de Spring Boot (Nginx lo necesita)
-      - 5701 # Puerto de Hazelcast
+      - 8080
+      - 5701
+    networks:
+      - search_network
+
+  search2:
+    build:
+      context: .
+      dockerfile: Dockerfile.search
+    depends_on:
+      - indexer-service
+    environment:
+      - HZ_CLUSTER_NAME=bd-search-cluster
+    expose:
+      - 8080
+      - 5701
     networks:
       - search_network
 
@@ -71,7 +85,8 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - search-service
+      - search1
+      - search2
     networks:
       - search_network
 
