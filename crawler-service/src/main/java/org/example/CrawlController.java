@@ -19,8 +19,14 @@ public class CrawlController {
             int count = crawlerService.processFolder(folder);
             return ResponseEntity.ok("Enqueued " + count + " files");
         } catch (Exception e) {
-            return ResponseEntity.status(500)
-                    .body("Error: " + e.getMessage());
+            return ResponseEntity.status(500).body(e.getMessage());
         }
+    }
+
+    // 🔴 NUEVO ENDPOINT
+    @PostMapping("/replicate")
+    public ResponseEntity<Void> replicate(@RequestBody ReplicationRequest req) {
+        crawlerService.storeReplica(req.documentId(), req.content());
+        return ResponseEntity.ok().build();
     }
 }

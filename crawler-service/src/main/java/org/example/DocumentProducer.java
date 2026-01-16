@@ -16,26 +16,25 @@
             this.jmsTemplate = jmsTemplate;
         }
 
-        public void sendDocumentReady(String documentId, String content, String hash) {
+        public void sendDocumentReady(String documentId, String location) {
             try {
                 Map<String, String> payload = new HashMap<>();
-                payload.put("type", "document_ready");
                 payload.put("documentId", documentId);
-                payload.put("content", content);
-                payload.put("hash", hash);
+                payload.put("location", location);
 
                 String json = mapper.writeValueAsString(payload);
 
                 jmsTemplate.convertAndSend("document.queue", json, message -> {
-                    message.setStringProperty("messageType", "document_ready");
                     message.setJMSCorrelationID(documentId);
                     return message;
                 });
 
-                System.out.println("Enviado mensaje document_ready id=" + documentId);
+                System.out.println("Document ready sent: " + documentId);
+
             } catch (Exception e) {
-                throw new RuntimeException("Error enviando mensaje JMS: " + e.getMessage(), e);
+                throw new RuntimeException(e);
             }
         }
+
     }
 

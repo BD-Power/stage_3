@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import jakarta.jms.Session;
 
 @Configuration
 @EnableJms
@@ -25,13 +26,18 @@ public class JmsConfig {
         return new JmsTemplate(connectionFactory);
     }
 
+
     @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(
             ActiveMQConnectionFactory connectionFactory) {
 
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
+
+        factory.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
+
         factory.setConcurrency("1-1");
         return factory;
     }
+
 }
