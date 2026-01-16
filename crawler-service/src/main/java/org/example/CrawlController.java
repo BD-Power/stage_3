@@ -14,16 +14,29 @@ public class CrawlController {
     }
 
     @PostMapping("/crawl")
-    public ResponseEntity<String> crawl(@RequestParam("folder") String folder) {
+    public ResponseEntity<String> crawl(
+            @RequestParam(required = false) String folder,
+            @RequestParam(required = false) String bookId) {
+
         try {
-            int count = crawlerService.processFolder(folder);
-            return ResponseEntity.ok("Enqueued " + count + " files");
+            if (bookId != null) {
+                // Descargar desde Project Gutenberg
+                for (String id : bookId.split(",")) {
+                    crawlerService.downloadAndProcessBook(Integer.parseInt(id.trim()));
+                }
+                return ResponseEntity.ok("Books downloaded and replicated.");
+            } else if (folder != null) {
+                // Procesar carpeta local
+                int count = crawlerService.processFolder(folder);
+                return ResponseEntity.ok("Processed " + count + " files.");
+            } else {
+                return ResponseEntity.badRequest().body("Specify 'folder' or 'bookId'");
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
 
-    // 🔴 NUEVO ENDPOINT
     @PostMapping("/replicate")
     public ResponseEntity<Void> replicate(@RequestBody ReplicationRequest req) {
         crawlerService.storeReplica(req.documentId(), req.content());
