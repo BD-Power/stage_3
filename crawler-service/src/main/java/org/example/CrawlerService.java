@@ -35,12 +35,12 @@ public class CrawlerService {
 
                     // Crear ID único para el documento
                     String documentId = UUID.randomUUID().toString();
-
                     // Calcular hash SHA-256
                     String hash = computeHash(file);
-
-                    // Enviar mensaje a ActiveMQ
-                    producer.sendDocumentReady(documentId, file.toString(), hash);
+                    // Leemos aquí el contenido
+                    String content = Files.readString(file);
+                    // Enviamos contenido
+                    producer.sendDocumentReady(documentId, content, hash);
 
                     count++;
                 }

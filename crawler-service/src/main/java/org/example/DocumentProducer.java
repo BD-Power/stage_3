@@ -16,12 +16,12 @@
             this.jmsTemplate = jmsTemplate;
         }
 
-        public void sendDocumentReady(String documentId, String ruta, String hash) {
+        public void sendDocumentReady(String documentId, String content, String hash) {
             try {
                 Map<String, String> payload = new HashMap<>();
                 payload.put("type", "document_ready");
                 payload.put("documentId", documentId);
-                payload.put("ruta", ruta);
+                payload.put("content", content);
                 payload.put("hash", hash);
 
                 String json = mapper.writeValueAsString(payload);

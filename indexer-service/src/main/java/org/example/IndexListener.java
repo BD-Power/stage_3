@@ -20,7 +20,6 @@ public class IndexListener {
 
     public IndexListener(HazelcastInstance hz) {
         this.hz = hz;
-
         this.processedDocuments = hz.getMap("processedDocuments");
     }
 
@@ -31,7 +30,7 @@ public class IndexListener {
             Map<String, Object> msg = mapper.readValue(messageJson, Map.class);
 
             String docId = (String) msg.get("documentId");
-            String ruta = (String) msg.get("ruta");
+            String content = (String) msg.get("content");
 
 
             if (processedDocuments.putIfAbsent(docId, Boolean.TRUE) != null) {
@@ -39,12 +38,7 @@ public class IndexListener {
                 return;
             }
 
-
-            System.out.println("📩 Mensaje recibido en INDEXER");
-            System.out.println(" - ID:   " + docId);
-            System.out.println(" - Ruta: " + ruta);
-
-            String content = Files.readString(Path.of(ruta));
+            System.out.println("Indexando documento ID: " + docId);
 
             indexDocument(docId, content);
 
