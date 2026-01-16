@@ -16,11 +16,12 @@
             this.jmsTemplate = jmsTemplate;
         }
 
-        public void sendDocumentReady(String documentId, String location) {
+        public void sendDocumentReady(String documentId, String location, String content) {
             try {
                 Map<String, String> payload = new HashMap<>();
                 payload.put("documentId", documentId);
                 payload.put("location", location);
+                payload.put("content", content);
 
                 String json = mapper.writeValueAsString(payload);
 
@@ -32,7 +33,7 @@
                 System.out.println("Document ready sent: " + documentId);
 
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Error sending JMS message: " + e.getMessage(), e);
             }
         }
 
