@@ -11,10 +11,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SearchClusterConfig {
 
-    @Bean
+    @Bean("searchHazelcast")
     public HazelcastInstance hazelcastInstance() {
-
-        // Config Hazelcast
         Config config = new Config();
         config.setClusterName("bd-search-cluster");
 
@@ -25,12 +23,10 @@ public class SearchClusterConfig {
                 .addMember("search1")
                 .addMember("search2");
 
-        // Map config (inverted index)
         MapConfig mapConfig = new MapConfig("inverted-index");
         mapConfig.setBackupCount(1);
         config.addMapConfig(mapConfig);
 
-        // Crear instancia Hazelcast
         return Hazelcast.newHazelcastInstance(config);
     }
 }

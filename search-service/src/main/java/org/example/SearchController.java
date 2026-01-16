@@ -2,6 +2,7 @@ package org.example;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.multimap.MultiMap;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,7 +14,7 @@ public class SearchController {
 
     private final HazelcastInstance hz;
 
-    public SearchController(HazelcastInstance hz) {
+    public SearchController(@Qualifier("searchHazelcast") HazelcastInstance hz) {
         this.hz = hz;
     }
 
@@ -23,4 +24,3 @@ public class SearchController {
         return index.get(term.toLowerCase());
     }
 }
-

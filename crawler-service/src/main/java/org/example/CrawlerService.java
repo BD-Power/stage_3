@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -57,6 +58,7 @@ public class CrawlerService {
         return count;
     }
 
+    // === NUEVO MÉTODO: descargar desde Project Gutenberg ===
     public void downloadAndProcessBook(int bookId) throws IOException {
         String url = String.format("https://www.gutenberg.org/cache/epub/%d/pg%d.txt", bookId, bookId);
         String content;
@@ -79,8 +81,9 @@ public class CrawlerService {
         }
     }
 
-    private int replicateToPeers(String docId, String content) {
-        int acks = 1; // el nodo local cuenta como 1 réplica
+    // === LÓGICA DE REPLICACIÓN ===
+    protected int replicateToPeers(String docId, String content) {
+        int acks = 1;
         for (String peer : peers) {
             if (peer == null || peer.trim().isEmpty()) continue;
             try {
@@ -97,7 +100,8 @@ public class CrawlerService {
         return acks;
     }
 
-    private void storeLocal(String docId, String content) throws IOException {
+    // === ALMACENAMIENTO LOCAL ===
+    protected void storeLocal(String docId, String content) throws IOException {
         Path dir = Paths.get(DATALAKE_BASE, crawlerId);
         Files.createDirectories(dir);
         Files.writeString(dir.resolve(docId + ".txt"), content);
@@ -111,6 +115,7 @@ public class CrawlerService {
         }
     }
 
+    // === CÁLCULO DE HASH ===
     private String computeHash(String content) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -124,5 +129,52 @@ public class CrawlerService {
             throw new RuntimeException("Hash computation failed", e);
         }
     }
-}
 
+
+    public static void main(String[] args) {
+        try {
+            System.out.println(" Iniciando prueba de descarga desde Project Gutenberg...");
+
+            DocumentProducer mockProducer = new DocumentProducer(null) {
+                @Override
+                public void sendDocumentReady(String documentId, String location, String content) {
+                    System.out.println(" Enviado a JMS (simulado): " + documentId);
+                }
+            };
+
+            // Creamos una instancia con valores de prueba
+            CrawlerService service = new CrawlerService(mockProducer) {
+                // Sobrescribimos métodos para usar rutas locales
+                @Override
+                protected void storeLocal(String docId, String content) throws IOException {
+                    Path dir = Paths.get("./datalake", "test-crawler");
+                    Files.createDirectories(dir);
+                    Files.writeString(dir.resolve(docId + ".txt"), content);
+                }
+
+                @Override
+                protected int replicateToPeers(String docId, String content) {
+                    System.out.println(" Replicación omitida en prueba local.");
+                    return 1; // solo el nodo local
+                }
+            };
+
+            // Descargamos Pride and Prejudice (ID 1342)
+            service.downloadAndProcessBook(1342);
+
+            // Verificamos
+            Path file = Paths.get("./datalake/test-crawler/pg1342.txt");
+            if (Files.exists(file)) {
+                System.out.println(" Éxito. Libro guardado en: " + file.toAbsolutePath());
+                String preview = Files.readString(file).substring(0, Math.min(300, (int) Files.size(file)));
+                System.out.println(" Vista previa: " + preview.replace("\n", " ").trim() + "...");
+            } else {
+                System.err.println(" Error: archivo no encontrado.");
+            }
+
+        } catch (Exception e) {
+            System.err.println(" Error:");
+            e.printStackTrace();
+        }
+    }
+}

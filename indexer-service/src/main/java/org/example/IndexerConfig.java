@@ -11,14 +11,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class IndexerConfig {
 
-    @Bean
+    @Bean("indexerHazelcast")
     public HazelcastInstance hazelcastInstance() {
-
-        // Crear configuración base de Hazelcast
         Config config = new Config();
         config.setClusterName("bd-search-cluster");
 
-        // ACTIVAR AUTO-DESCUBRIMIENTO PARA EL CLUSTER
         JoinConfig join = config.getNetworkConfig().getJoin();
         join.getMulticastConfig().setEnabled(false);
         join.getTcpIpConfig().setEnabled(true)
@@ -26,12 +23,10 @@ public class IndexerConfig {
                 .addMember("search1")
                 .addMember("search2");
 
-        // Configurar el índice invertido como MultiMap
-        MapConfig invertedIndex = new MapConfig("inverted-index");
-        invertedIndex.setBackupCount(1);  // 1 réplica
-        config.addMapConfig(invertedIndex);
+        MapConfig mapConfig = new MapConfig("inverted-index");
+        mapConfig.setBackupCount(1);
+        config.addMapConfig(mapConfig);
 
-        // Crear e iniciar un nodo Hazelcast para este Indexer
         return Hazelcast.newHazelcastInstance(config);
     }
 }
