@@ -20,7 +20,7 @@ import java.util.Map;
 @Component
 public class IndexListener {
 
-    private static final String DATALAKE_BASE = "/datalake";
+    private static final String DATALAKE_BASE = "/data";
 
     private final HazelcastInstance hz;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -46,14 +46,16 @@ public class IndexListener {
 
             String docId = (String) msg.get("documentId");
             String location = (String) msg.get("location");
-
+            String content = (String) msg.get("content");
         
             if (processedDocuments.putIfAbsent(docId, Boolean.TRUE) != null) {
                 message.acknowledge();
                 return;
             }
-
-            String content = readFromDatalake(docId, location);
+            if (content == null) {
+                System.out.println("Message contains null content. Attempting to read disk...");
+                content = readFromDatalake(docId, location);
+            }
 
             indexDocument(docId, content);
 
@@ -93,6 +95,6 @@ public class IndexListener {
             inverted.put(token, docId);
         }
 
-        System.out.println("Documento indexado desde datalake: " + docId);
+        System.out.println("Document indexed from datalake: " + docId);
     }
 }
