@@ -25,11 +25,11 @@ services:
     environment:
       - SPRING_ACTIVEMQ_BROKER-URL=tcp://activemq:61616
     volumes:
-      - datalake_data:/data # Montaje para el Datalake
+      - ./datalake:/data # Montaje para el Datalake
+    ports:
+      - "8081:8081"
     networks:
       - search_network
-    expose:
-      - 8080 # Puerto de Spring Boot (comunicación interna)
 
   # 3. Indexer Service (Consumer JMS + Miembro Hazelcast)
   indexer-service:

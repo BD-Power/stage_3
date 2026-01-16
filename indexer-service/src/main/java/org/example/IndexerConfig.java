@@ -16,12 +16,15 @@ public class IndexerConfig {
 
         // Crear configuración base de Hazelcast
         Config config = new Config();
-        config.setClusterName("search-cluster");
+        config.setClusterName("bd-search-cluster");
 
         // ACTIVAR AUTO-DESCUBRIMIENTO PARA EL CLUSTER
         JoinConfig join = config.getNetworkConfig().getJoin();
-        join.getMulticastConfig().setEnabled(true);
-        join.getTcpIpConfig().setEnabled(false);
+        join.getMulticastConfig().setEnabled(false);
+        join.getTcpIpConfig().setEnabled(true)
+                .addMember("indexer-service")
+                .addMember("search1")
+                .addMember("search2");
 
         // Configurar el índice invertido como MultiMap
         MapConfig invertedIndex = new MapConfig("inverted-index");
