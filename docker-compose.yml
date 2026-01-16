@@ -61,6 +61,8 @@ services:
     environment:
       - SPRING_ACTIVEMQ_BROKER-URL=tcp://activemq:61616
       - HZ_CLUSTER_NAME=bd-search-cluster
+    volumes:
+      - ./datalake:/data
     expose:
       - 8080
       - 5701
