@@ -77,7 +77,7 @@ public class CrawlerService {
 
         int acks = replicateToPeers(documentId, content);
         if (acks >= REPLICATION_FACTOR) {
-            producer.sendDocumentReady(documentId, crawlerId, content);
+            producer.sendDocumentReady(documentId, crawlerId, null);
         }
     }
 
