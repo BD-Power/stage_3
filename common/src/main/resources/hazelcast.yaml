@@ -1,0 +1,18 @@
+hazelcast:
+  cluster-name: search-cluster
+
+  network:
+    port:
+      port: 5701
+      auto-increment: true
+
+    join:
+      multicast:
+        enabled: true
+      tcp-ip:
+        enabled: false
+
+  map:
+    inverted-index:
+      backup-count: 2
+      async-backup-count: 1
