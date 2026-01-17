@@ -27,11 +27,13 @@ public class JmsConfig {
     }
 
 
-    @Bean
+   @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(
             ActiveMQConnectionFactory connectionFactory) {
 
-        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+        DefaultJmsListenerContainerFactory factory =
+                new DefaultJmsListenerContainerFactory();
+
         factory.setConnectionFactory(connectionFactory);
 
         factory.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
@@ -39,5 +41,6 @@ public class JmsConfig {
         factory.setConcurrency("1-1");
         return factory;
     }
+
 
 }

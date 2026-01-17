@@ -1,41 +1,40 @@
-    package org.example;
+package org.example;
 
-    import com.fasterxml.jackson.databind.ObjectMapper;
-    import org.springframework.jms.core.JmsTemplate;
-    import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.stereotype.Component;
 
-    import java.util.HashMap;
-    import java.util.Map;
+import java.util.HashMap;
+import java.util.Map;
 
-    @Component
-    public class DocumentProducer {
-        private final JmsTemplate jmsTemplate;
-        private final ObjectMapper mapper = new ObjectMapper();
+@Component
+public class DocumentProducer {
 
-        public DocumentProducer(JmsTemplate jmsTemplate) {
-            this.jmsTemplate = jmsTemplate;
-        }
+    private final JmsTemplate jmsTemplate;
+    private final ObjectMapper mapper = new ObjectMapper();
 
-        public void sendDocumentReady(String documentId, String location, String content) {
-            try {
-                Map<String, String> payload = new HashMap<>();
-                payload.put("documentId", documentId);
-                payload.put("location", location);
-                payload.put("content", content);
-
-                String json = mapper.writeValueAsString(payload);
-
-                jmsTemplate.convertAndSend("document.queue", json, message -> {
-                    message.setJMSCorrelationID(documentId);
-                    return message;
-                });
-
-                System.out.println("Document ready sent: " + documentId);
-
-            } catch (Exception e) {
-                throw new RuntimeException("Error sending JMS message: " + e.getMessage(), e);
-            }
-        }
-
+    public DocumentProducer(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
     }
 
+    public void sendDocumentReady(String documentId, String location, String content) {
+        try {
+            Map<String, String> payload = new HashMap<>();
+            payload.put("documentId", documentId);
+            payload.put("location", location);
+            payload.put("content", content);
+
+            String json = mapper.writeValueAsString(payload);
+
+            jmsTemplate.convertAndSend("document.queue", json, message -> {
+                message.setJMSCorrelationID(documentId);
+                return message;
+            });
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error serializando JSON", e);
+        }
+    }
+
+}

@@ -35,6 +35,7 @@ public class IndexListener {
             containerFactory = "jmsListenerContainerFactory"
     )
     public void onMessage(Message message) {
+
         try {
             TextMessage textMessage = (TextMessage) message;
             String messageJson = textMessage.getText();
@@ -46,30 +47,41 @@ public class IndexListener {
             String location = (String) msg.get("location");
             String content = (String) msg.get("content");
 
+            
             if (processedDocuments.putIfAbsent(docId, Boolean.TRUE) != null) {
                 message.acknowledge();
                 return;
             }
 
-            if (content == null) {
-                System.out.println("Message contains null content. Attempting to read disk...");
+            if (content == null || content.isBlank()) {
                 content = readFromDatalake(docId, location);
             }
 
             indexDocument(docId, content);
+
+            
             message.acknowledge();
 
+            System.out.println("Documento indexado correctamente: " + docId);
+
         } catch (Exception e) {
+            System.err.println("Error procesando mensaje JMS → reentrega");
             e.printStackTrace();
+            
         }
     }
 
     private String readFromDatalake(String docId, String location) throws Exception {
-        Path primary = Paths.get(DATALAKE_BASE, location, docId + ".txt");
-        if (Files.exists(primary)) {
-            return Files.readString(primary);
+
+        
+        if (location != null) {
+            Path primary = Paths.get(DATALAKE_BASE, location, docId + ".txt");
+            if (Files.exists(primary)) {
+                return Files.readString(primary);
+            }
         }
 
+        
         List<String> replicas = List.of("crawler1", "crawler2", "crawler3");
         for (String replica : replicas) {
             Path candidate = Paths.get(DATALAKE_BASE, replica, docId + ".txt");
@@ -82,12 +94,14 @@ public class IndexListener {
     }
 
     private void indexDocument(String docId, String content) {
+
         MultiMap<String, String> inverted = hz.getMultiMap("inverted-index");
+
         String[] tokens = content.toLowerCase().split("\\W+");
         for (String token : tokens) {
-            if (token.isBlank()) continue;
-            inverted.put(token, docId);
+            if (!token.isBlank()) {
+                inverted.put(token, docId);
+            }
         }
-        System.out.println("Document indexed from datalake: " + docId);
     }
 }
