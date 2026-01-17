@@ -58,7 +58,7 @@ public class CrawlerService {
         return count;
     }
 
-    // === NUEVO MÉTODO: descargar desde Project Gutenberg ===
+    // Descargar desde Project Gutenberg
     public void downloadAndProcessBook(int bookId) throws IOException {
         String url = String.format("https://www.gutenberg.org/cache/epub/%d/pg%d.txt", bookId, bookId);
         String content;
@@ -76,8 +76,9 @@ public class CrawlerService {
         storeLocal(documentId, content);
 
         int acks = replicateToPeers(documentId, content);
-        if (acks >= REPLICATION_FACTOR) {
-            producer.sendDocumentReady(documentId, crawlerId, null);
+        System.out.println("Replication ACKs received: " + acks + " (Target: " + REPLICATION_FACTOR + ")");
+        if (acks >= 1) {
+            producer.sendDocumentReady(documentId, crawlerId, content);
         }
     }
 

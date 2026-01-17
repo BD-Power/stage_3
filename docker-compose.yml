@@ -26,7 +26,7 @@ services:
     environment:
       - CRAWLER_ID=crawler1
       - CRAWLER_PEERS=crawler2
-      - SPRING_ACTIVEMQ_BROKER-URL=tcp://activemq:61616
+      - SPRING_ACTIVEMQ_BROKER_URL=tcp://activemq:61616
     volumes:
       - ./datalake:/data
     ports:
@@ -45,7 +45,7 @@ services:
     environment:
       - CRAWLER_ID=crawler2
       - CRAWLER_PEERS=crawler1
-      - SPRING_ACTIVEMQ_BROKER-URL=tcp://activemq:61616
+      - SPRING_ACTIVEMQ_BROKER_URL=tcp://activemq:61616
     volumes:
       - ./datalake:/data
     networks:
@@ -59,7 +59,7 @@ services:
     depends_on:
       - activemq
     environment:
-      - SPRING_ACTIVEMQ_BROKER-URL=tcp://activemq:61616
+      - SPRING_ACTIVEMQ_BROKER_URL=tcp://activemq:61616
       - HZ_CLUSTER_NAME=bd-search-cluster
     volumes:
       - ./datalake:/data
