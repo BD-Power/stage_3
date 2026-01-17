@@ -1,1 +1,0 @@
-"Funciona el sistema distribuido del stage 3".
